@@ -3,7 +3,7 @@ scribe-monitor
 
 Monitor scribe server to statsd
 
-- Scribe process status
+- Scribe process status (logged to statsd under gauges)
 - Value of scribe counters (packages received, sent, ...)
 - Total file size of the file store (useful for monitoring secondary store)
 
