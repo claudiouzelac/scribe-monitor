@@ -99,7 +99,11 @@ class SecondaryStoreMonitor(threading.Thread):
 
         for d, sd, files in os.walk(self._options.secondary_store):
             for f in files:
-                size += int(round(os.path.getsize(os.path.join(d, f)) / 1E3))
+                filepath = os.path.join(d, f)
+                try:
+                    size += int(round(os.path.getsize(filepath) / 1E3))
+                except OSError:
+                    logger.warning('Invalid file %s', filepath)
 
         self._statsd.incr('secondary_store_size', size)
 
