@@ -7,7 +7,7 @@ if sys.version_info < (2, 7):
 
 setup(
     name='scribe-monitor',
-    version='0.1.1',
+    version='0.2',
     author='Jure Ham',
     license='Apache 2.0',
     author_email='jure.ham@zemanta.com',

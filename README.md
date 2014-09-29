@@ -6,6 +6,7 @@ Monitor scribe server to statsd
 - Scribe process status (logged to statsd under gauges)
 - Value of scribe counters (packages received, sent, ...)
 - Total file size of the file store (useful for monitoring secondary store)
+- Data written to hdfs (checks all buckets on hdfs and reports size diff to statsd)
 
 Example:
 --------
@@ -30,6 +31,8 @@ Options:
         Scribe thrift host
     --ctrl-port CTRL_PORT
         Scribe thrift port
+    --hdfs-path HDFS_PATH
+        Path to log files on hdfs
     --statsd-host STATSD_HOST
     --statsd-port STATSD_PORT
     --statsd-prefix STATSD_PREFIX

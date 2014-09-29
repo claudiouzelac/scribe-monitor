@@ -1,9 +1,12 @@
 import os
+import datetime
 import time
 import threading
 import socket
 import argparse
 import logging
+import subprocess
+import shlex
 from collections import defaultdict
 
 import statsd as statsd_module
@@ -17,6 +20,7 @@ from fb303.ttypes import fb_status
 
 
 DEFAULT_CHECK_WAIT = 1.0
+HDFS_CHECK_WAIT = 30.0
 
 DEFAULT_STATSD_HOST = 'localhost'
 DEFAULT_STATSD_PORT = 8125
@@ -40,6 +44,8 @@ def parse_options():
 
     parser.add_argument('--ctrl-host', default=DEFAULT_SCRIBE_HOST, help='Scribe thrift host')
     parser.add_argument('--ctrl-port', default=DEFAULT_SCRIBE_PORT, type=int, help='Scribe thrift port')
+
+    parser.add_argument('--hdfs-path', help='Path to log files on hdfs')
 
     parser.add_argument('--statsd-host', default=DEFAULT_STATSD_HOST)
     parser.add_argument('--statsd-port', type=int, default=DEFAULT_STATSD_PORT)
@@ -186,6 +192,80 @@ class StatusMonitor(threading.Thread):
             time.sleep(DEFAULT_CHECK_WAIT)
 
 
+class HdfsMonitor(threading.Thread):
+
+    def __init__(self, options, statsd):
+        self._statsd = statsd
+        self._options = options
+
+        self._written_total = 0
+        self._read_date = None
+
+        super(HdfsMonitor, self).__init__()
+        self.daemon = True
+
+    def _get_search_path(self, date):
+        return os.path.join(
+            self._options.hdfs_path,
+            '*',
+            '*-{date}*'.format(date=date),
+        )
+
+    def check_store_size(self):
+        size = 0
+        size_today = 0
+        today = datetime.date.today().isoformat()
+
+        search_path = []
+        search_path.append(self._get_search_path(today))
+        if self._read_date and self._read_date != today:
+            search_path.append(self._get_search_path(self._read_date))
+
+        try:
+            ls = subprocess.Popen(
+                ['hadoop', 'fs', '-ls'] + search_path,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+        except OSError:
+            logger.exception('Hadoop command not found')
+            self._statsd.incr('file_write', 0)
+            return
+
+        for line in ls.stdout:
+            if line.find(self._options.hdfs_path) < 0:
+                continue
+
+            values = shlex.split(line)
+
+            file_size = int(values[4])
+            size += file_size
+
+            if values[7].find(today):
+                size_today += file_size
+
+        if self._read_date is None:
+            self._read_date = today
+            self._written_total = size_today
+            return
+
+        size_diff = size - self._written_total
+        self._read_date = today
+        self._written_total = size_today
+
+        size_diff_kb = int(round(size_diff / 1E3))
+
+        self._statsd.incr('hdfs_write', size_diff_kb)
+
+    def run(self):
+        if not self._options.hdfs_path:
+            return
+
+        while True:
+            self.check_store_size()
+            time.sleep(HDFS_CHECK_WAIT)
+
+
 def run_monitor():
     options = parse_options()
     statsd = StatsD(options)
@@ -193,9 +273,12 @@ def run_monitor():
 
     fs_monitor = FileStoreMonitor(options, statsd)
     status_monitor = StatusMonitor(options, statsd)
+    hdfs_monitor = HdfsMonitor(options, statsd)
 
     fs_monitor.start()
     status_monitor.start()
+    hdfs_monitor.start()
 
     fs_monitor.join()
     status_monitor.join()
+    hdfs_monitor.join()
