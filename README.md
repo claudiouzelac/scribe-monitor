@@ -7,12 +7,14 @@ Monitor scribe server to statsd
 - Value of scribe counters (packages received, sent, ...)
 - Total file size of the file store (useful for monitoring secondary store)
 
-![Primary store goes down](/docs/upstream-down.png?raw-true "promary store goes down")
-
 Example:
 --------
 
     scribe_monitor --secondary-store=/home/scribe --statsd-host=scribe
+
+**Primary store goes down**
+
+![Primary store goes down](/docs/upstream-down.png?raw-true "promary store goes down")
 
 Install:
 --------
