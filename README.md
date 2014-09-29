@@ -13,6 +13,10 @@ Example:
 
     scribe_monitor --secondary-store=/home/scribe --statsd-host=scribe
 
+Install:
+--------
+
+    pip install scribe-monitor
 
 Options:
 --------
