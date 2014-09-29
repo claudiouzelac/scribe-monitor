@@ -17,8 +17,8 @@ Example:
 Options:
 --------
 
-    --secondary-store SECONDARY_STORE
-        Path to the secondary store location
+    --file-store-path FILE_STORE_PATH
+        Path to the file store location
     --log-file LOG_FILE
         Path to the log file
     --ctrl-host CTRL_HOST

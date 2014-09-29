@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 def parse_options():
     parser = argparse.ArgumentParser(description='Monitor scribe server.')
 
-    parser.add_argument('--secondary-store', help='Path to the secondary store location')
+    parser.add_argument('--file-store-path', help='Path to the file store location')
     parser.add_argument('--log-file', help='Path to the log file')
 
     parser.add_argument('--ctrl-host', default=DEFAULT_SCRIBE_HOST, help='Scribe thrift host')
@@ -85,19 +85,19 @@ class StatsD(object):
         self._statsc.gauge('{0}.{1}'.format(self._source, name), value)
 
 
-class SecondaryStoreMonitor(threading.Thread):
+class FileStoreMonitor(threading.Thread):
 
     def __init__(self, options, statsd):
         self._statsd = statsd
         self._options = options
 
-        super(SecondaryStoreMonitor, self).__init__()
+        super(FileStoreMonitor, self).__init__()
         self.daemon = True
 
     def check_store_size(self):
         size = 0
 
-        for d, sd, files in os.walk(self._options.secondary_store):
+        for d, sd, files in os.walk(self._options.file_store_path):
             for f in files:
                 filepath = os.path.join(d, f)
                 try:
@@ -105,10 +105,10 @@ class SecondaryStoreMonitor(threading.Thread):
                 except OSError:
                     logger.warning('Invalid file %s', filepath)
 
-        self._statsd.incr('secondary_store_size', size)
+        self._statsd.incr('file_store_size', size)
 
     def run(self):
-        if not self._options.secondary_store:
+        if not self._options.file_store_path:
             return
 
         while True:
@@ -192,11 +192,11 @@ def run_monitor():
     statsd = StatsD(options)
     configure_logger(options)
 
-    ss_monitor = SecondaryStoreMonitor(options, statsd)
+    fs_monitor = FileStoreMonitor(options, statsd)
     status_monitor = StatusMonitor(options, statsd)
 
-    ss_monitor.start()
+    fs_monitor.start()
     status_monitor.start()
 
-    ss_monitor.join()
+    fs_monitor.join()
     status_monitor.join()
