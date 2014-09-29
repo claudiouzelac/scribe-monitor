@@ -18,5 +18,4 @@ setup(
     platforms='any',
     scripts=['scribemonitor/scribe_monitor'],
     zip_safe=False,
-    **extra
 )
