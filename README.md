@@ -26,8 +26,6 @@ Options:
 
     --file-store-path FILE_STORE_PATH
         Path to the file store location
-    --log-file LOG_FILE
-        Path to the log file
     --ctrl-host CTRL_HOST
         Scribe thrift host
     --ctrl-port CTRL_PORT

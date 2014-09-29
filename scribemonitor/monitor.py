@@ -37,7 +37,6 @@ def parse_options():
     parser = argparse.ArgumentParser(description='Monitor scribe server.')
 
     parser.add_argument('--file-store-path', help='Path to the file store location')
-    parser.add_argument('--log-file', help='Path to the log file')
 
     parser.add_argument('--ctrl-host', default=DEFAULT_SCRIBE_HOST, help='Scribe thrift host')
     parser.add_argument('--ctrl-port', default=DEFAULT_SCRIBE_PORT, type=int, help='Scribe thrift port')
