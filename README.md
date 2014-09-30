@@ -15,7 +15,13 @@ Example:
 
 **Primary store goes down**
 
-![Primary store goes down](/docs/upstream-down.png?raw-true "promary store goes down")
+![Primary store goes down](/docs/upstream-down.png?raw-true")
+
+    scribe_monitor --hdfs-path hdfs://example/user/me/logs/ --secondary-store=/home/scribe --statsd-host=scribe
+
+**Hdfs stops accepting writes**
+
+![Hdfs stops accepting writes](/docs/hdfs-down.png?raw-true)
 
 Install:
 --------
