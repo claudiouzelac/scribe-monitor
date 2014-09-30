@@ -241,7 +241,7 @@ class HdfsMonitor(threading.Thread):
             file_size = int(values[4])
             size += file_size
 
-            if values[7].find(today):
+            if values[7].find(today) >= 0:
                 size_today += file_size
 
         if self._read_date is None:
