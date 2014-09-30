@@ -2,4 +2,4 @@
 
 from scribemonitor import monitor
 
-monitor.run_monitor()
+monitor.run_monitors()

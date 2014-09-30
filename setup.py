@@ -13,7 +13,7 @@ setup(
     author_email='jure.ham@zemanta.com',
     description="Monitor scribe server to statsd",
     url='https://github.com/Zemanta/scribemonitor',
-    packages=['scribemonitor'],
+    packages=['scribemonitor', 'scribemonitor/monitors'],
     install_requires=['statsd', 'facebook-scribe'] + extra.get('install_requires', []),
     platforms='any',
     scripts=['scribemonitor/scribe_monitor'],
