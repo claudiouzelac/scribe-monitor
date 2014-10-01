@@ -11,13 +11,13 @@ Monitor scribe server to statsd
 Example:
 --------
 
-    scribe_monitor --secondary-store=/home/scribe --statsd-host=scribe
+    scribe_monitor --file-store-path=/home/scribe --statsd-host=scribe
 
 **Primary store goes down**
 
 ![Primary store goes down](/docs/upstream-down.png?raw-true")
 
-    scribe_monitor --hdfs-path hdfs://example/user/me/logs/ --secondary-store=/home/scribe --statsd-host=scribe
+    scribe_monitor --hdfs-path hdfs://example/user/me/logs/ --file-store-path=/home/scribe --statsd-host=scribe
 
 **Hdfs stops accepting writes**
 
